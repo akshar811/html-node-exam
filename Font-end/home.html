@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Home page</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <!-- <link rel="stylesheet" href="css/style1.css"> -->
+    <style>
+      body {
+        background: #dde1e7;
+      }
+      .container {
+        max-width: 1340px;
+        margin: auto;
+      }
+      #box {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 23px;
+      }
+      #box div {
+        background: #dde1e7;
+        border-radius: 10px;
+        box-shadow: -3px -3px 7px #ffffff73,
+          2px 2px 5px rgba(94, 104, 121, 0.288);
+        /* margin-left: 10px; */
+        padding: 15px;
+        margin-bottom: 40px;
+        /* width: 330px; */
+      }
+      #box div img {
+        /* width: 325px; */
+        height: 280px;
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+        display: block;
+        margin: auto;
+      }
+      #box div h1 {
+        font-size: 23px;
+        padding-top: 23px;
+        padding-left: 10px;
+      }
+      #box div h6 {
+        font-size: 17px;
+        padding-top: 11px;
+        padding-left: 10px;
+      }
+      #box div h3 {
+        font-size: 17px;
+        padding-top: 12px;
+        padding-left: 10px;
+      }
+      #box div button {
+        box-shadow: 2px 2px 5px #babecc, -5px -5px 10px #ffffff73;
+        font-size: 18px;
+        line-height: 50px;
+        font-weight: 600;
+        background: #dde1e7;
+        border-radius: 25px;
+        border: none;
+        outline: none;
+        cursor: pointer;
+        color: #595959;
+        width: 90%;
+        height: 50px;
+        display: block;
+        margin: 26px auto;
+      }
+      #box div button:focus {
+        color: #3498db;
+        box-shadow: inset 2px 2px 5px #babecc, inset -5px -5px 10px #ffffff73;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="navbar">
+      <ul>
+        <li><a href="home.html">Home</a></li>
+        <li><a href="product.html">Product</a></li>
+        <li><a href="signup.html">sign up</a></li>
+        <li><a href="login.html">Login </a></li>
+      </ul>
+    </div>
+    <div class="container">
+      <div id="box"></div>
+    </div>
+  </body>
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+  <script>
+    const handle = async (amount) => {
+      let res = await fetch(`http://localhost:8090/user/paymnet`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ amount: amount }),
+      });
+      let order = await res.json();
+      console.log(order);
+
+      let options = {
+        key: "rzp_test_Jmrh2JYyArBNwD",
+        amount: order.amount,
+      };
+      let rpay = new Razorpay(options);
+      rpay.open();
+    };
+
+    const display = (data) => {
+      document.getElementById("box").innerHTML = "";
+      data.map((ele) => {
+        img = document.createElement("img");
+        img.src = ele.image;
+
+        title = document.createElement("h1");
+        title.innerHTML = `Title : ${ele.title}`;
+
+        description = document.createElement("h6");
+        description.innerHTML = `Description : ${ele.description}`;
+
+        price = document.createElement("h3");
+        price.innerHTML = `Price :${ele.price}`;
+
+        btn = document.createElement("button");
+        btn.innerHTML = "Buy Now";
+        btn.addEventListener("click", () => handle(ele.price));
+
+        div = document.createElement("div");
+        div.append(img, title, description, price, btn);
+
+        document.getElementById("box").append(div);
+      });
+    };
+
+    const get = () => {
+      fetch(`http://localhost:8090/user/find`)
+        .then((res) => res.json())
+        .then((data) => {
+          console.log(data);
+          display(data);
+        })
+        .catch((err) => console.log(err));
+    };
+    get();
+  </script>
+</html>
